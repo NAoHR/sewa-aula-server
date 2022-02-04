@@ -1,24 +1,20 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const mongoose = require("mongoose");
 require("dotenv").config();
 
-const dummyUser = [
-    {
-        id : "09132871429",
-        username: 'najmi',
-        password: '$2b$10$FVxrp2ujcp2uu1iZBh5ypecqlIitkezptc9t1pSO99GprzHEtkxM2'
-    }
-];
+const {Admin} = require("../../model/admin.model");
+
 
 const authVerifLogin = async (req,res,next) => {
     const {username,password} = req.body;
     if(username !== undefined && password !== undefined){
         try{
-            const findUser = dummyUser.find(item => item.username == username);
+            const findUser = await Admin.findOne({username : username})
             if(findUser == null){
                 return res.status(501).json({
                     "ok" : false,
-                    "message" : "tidak terdaftar di database"
+                    "message" : "user tidak terdaftar di database"
                 });
             }
             const isPasswordMatchToHas = await bcrypt.compare(password,findUser.password);
@@ -71,7 +67,26 @@ const authorizeUser = async (req,res,next) => {
         })
     }
 }
+
+const superAdminOnly = async (req,res,next) => {
+    const {id} = req.detailUser;
+    try{
+        const getDetailfromID = await Admin.findById(id);
+        if(getDetailfromID.role == "super_admin"){
+            return next();
+        }
+        return res.status(401).json({
+            ok : false,
+            message : "not allowed"
+        })
+    }catch(Err){
+        return res.send("error occured");
+    }
+}
+
+
 module.exports = {
     authVerifLogin,
-    authorizeUser
+    authorizeUser,
+    superAdminOnly
 }
