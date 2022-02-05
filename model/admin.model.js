@@ -7,7 +7,6 @@ const AdminScheme = mongoose.Schema({
     },
     password : String,
     role : String,
-    dateCreated: Date
 })
 
 const Admin = mongoose.model("Admin",AdminScheme);

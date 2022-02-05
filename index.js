@@ -28,7 +28,6 @@ app.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
                 username : username,
                 password : newPassword,
                 role : role,
-                dateCreated : new Date()
             })
             const saveIt = await createAdmin.save();
             return res.status(200).json({
@@ -48,7 +47,8 @@ app.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
         }
     }
     res.json({
-        zamn : "ok"
+        ok : false,
+        message : "tidak valid"
     })
 })
 
@@ -61,7 +61,8 @@ app.post("/login", authVerifLogin,async (req,res) => {
         })
     }catch(Err){
         return res.json({
-            zamn : "asd"
+            ok : false,
+            message : "server error"
         })
     }
 })
