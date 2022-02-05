@@ -14,12 +14,13 @@ const router = express.Router();
 
 router.post("/login", authVerifLogin,async (req,res) => {
     try{
-        const token = await jwt.sign(req.afterVerify,process.env.SECRET_KEY);
+        const token = await jwt.sign(req.afterVerify,process.env.SECRET_ACCESS_KEY);
         return res.json({
             ok : true,
             token : token
         })
     }catch(Err){
+        console.log(Err);
         return res.json({
             ok : false,
             message : "server error"
@@ -38,11 +39,24 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
                 password : newPassword,
                 role : role,
             })
-            const saveIt = await createAdmin.save();
+            await createAdmin.save();
+
+            const accessToken = await createAdmin.createAccessToken();
+            const refreshToken = await createAdmin.createRefreshToken()
+            
+            if(!accessToken || !refreshToken){
+                return res.status(500).status({
+                    ok : false,
+                    message : "internal error"
+                })
+            }
             return res.status(200).json({
-                "ok" : true
+                ok : true,
+                accessToken : accessToken,
+                refreshToken : refreshToken
             })
         }catch(e){
+            console.log(e);
             if(e.message.split(":")[0] === "E11000 duplicate key error collection"){
                 return res.status(500).json({
                     ok : false,

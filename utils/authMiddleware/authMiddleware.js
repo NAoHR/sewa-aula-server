@@ -51,10 +51,11 @@ const authorizeUser = async (req,res,next) => {
                 message : "dilarang"
             })
         }
-        const verifyIt = await jwt.verify(req.headers.jwt,process.env.SECRET_KEY)
+        const verifyIt = await jwt.verify(req.headers.jwt,process.env.SECRET_ACCESS_KEY)
         req.detailUser = verifyIt;
         next();
     }catch(err){
+        console.log(err);
         if(err.name == "JsonWebTokenError"){
             return res.status(401).json({
                 ok : false,
@@ -80,6 +81,7 @@ const superAdminOnly = async (req,res,next) => {
             message : "not allowed"
         })
     }catch(Err){
+        console.log(Err);
         return res.send("error occured");
     }
 }
