@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const {Admin} = require("../../model/admin.model");
-
+const Token = require("../../model/token.model")
 
 const authVerifLogin = async (req,res,next) => {
     const {username,password} = req.body;
@@ -88,9 +88,36 @@ const superAdminOnly = async (req,res,next) => {
     }
 }
 
+const generateRefreshToken = async (req,res,next) => {
+    const {refreshToken} = req.body;
+    if(!refreshToken){
+        return res.status(404).json({
+            ok : false,
+            message : "token missing"
+        })
+    }
+    const getRefreshToken = await Token.findOne({tokenId : refreshToken});
+    if(!getRefreshToken){
+        return res.status(401).json({
+            ok : false,
+            message : "token not found, please login again"
+        })
+    }
+    const payload = await jwt.verify(getRefreshToken.tokenId,process.env.SECRET_REFRESH_KEY);
+    const newAccessToken = await jwt.sign({
+        id : payload.id,
+        username : payload.username
+    },process.env.SECRET_ACCESS_KEY,{
+        expiresIn : "10m"
+    });
+    req.newAccessToken = newAccessToken;
+    return next()
+
+}
 
 module.exports = {
     authVerifLogin,
     authorizeUser,
-    superAdminOnly
+    superAdminOnly,
+    generateRefreshToken
 }

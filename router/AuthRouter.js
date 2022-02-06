@@ -1,11 +1,11 @@
-const bodyParser = require("body-parser");
 const express = require("express");
-const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const {
-    authVerifLogin,authorizeUser,superAdminOnly
+    authVerifLogin,authorizeUser,superAdminOnly,generateRefreshToken
 } = require("../utils/authMiddleware/authMiddleware");
+
 const {
     Admin
 } = require("../model/admin.model");
@@ -69,6 +69,18 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
         ok : false,
         message : "tidak valid"
     })
+})
+
+router.post("/refreshToken",generateRefreshToken, (req,res) => {
+    try{
+        return res.status(200).json(
+            {
+                accessToken : req.newAccessToken
+            }
+        );
+    }catch(e){
+        console.log(e)
+    }
 })
 
 module.exports = router;
