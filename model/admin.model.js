@@ -9,8 +9,15 @@ const AdminScheme = mongoose.Schema({
         type : String,
         unique : true
     },
-    password : String,
-    role : String,
+    password : {
+        type : String,
+        required : true
+    },
+    role : {
+        type : String,
+        enum : ["admin","super_admin"],
+        required : true
+    },
 })
 AdminScheme.methods = {
     createAccessToken : async function () {
