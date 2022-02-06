@@ -19,9 +19,11 @@ const authVerifLogin = async (req,res,next) => {
             }
             const isPasswordMatchToHas = await bcrypt.compare(password,findUser.password);
             if(isPasswordMatchToHas){
+                const refreshToken = await findUser.createAccessToken();
+                const accessToken = await findUser.createRefreshToken();
                 req.afterVerify = {
-                    "id" : findUser.id,
-                    "username" : findUser.username,
+                    "accessToken" : accessToken,
+                    "refreshToken" : refreshToken,
                 };
                 return next();
             }

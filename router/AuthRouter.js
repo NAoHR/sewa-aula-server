@@ -14,11 +14,7 @@ const router = express.Router();
 
 router.post("/login", authVerifLogin,async (req,res) => {
     try{
-        const token = await jwt.sign(req.afterVerify,process.env.SECRET_ACCESS_KEY);
-        return res.json({
-            ok : true,
-            token : token
-        })
+        return res.json(req.afterVerify);
     }catch(Err){
         console.log(Err);
         return res.json({
@@ -43,7 +39,7 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
 
             const accessToken = await createAdmin.createAccessToken();
             const refreshToken = await createAdmin.createRefreshToken()
-            
+
             if(!accessToken || !refreshToken){
                 return res.status(500).status({
                     ok : false,
