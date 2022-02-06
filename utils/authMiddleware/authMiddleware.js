@@ -19,8 +19,8 @@ const authVerifLogin = async (req,res,next) => {
             }
             const isPasswordMatchToHas = await bcrypt.compare(password,findUser.password);
             if(isPasswordMatchToHas){
-                const refreshToken = await findUser.createAccessToken();
-                const accessToken = await findUser.createRefreshToken();
+                const accessToken = await findUser.createAccessToken();
+                const refreshToken = await findUser.createRefreshToken();
                 req.afterVerify = {
                     "accessToken" : accessToken,
                     "refreshToken" : refreshToken,
@@ -103,15 +103,31 @@ const generateRefreshToken = async (req,res,next) => {
             message : "token not found, please login again"
         })
     }
-    const payload = await jwt.verify(getRefreshToken.tokenId,process.env.SECRET_REFRESH_KEY);
-    const newAccessToken = await jwt.sign({
-        id : payload.id,
-        username : payload.username
-    },process.env.SECRET_ACCESS_KEY,{
-        expiresIn : "10m"
-    });
-    req.newAccessToken = newAccessToken;
-    return next()
+    try{
+        const payload = await jwt.verify(getRefreshToken.tokenId,process.env.SECRET_REFRESH_KEY);
+        const newAccessToken = await jwt.sign({
+            id : payload.id,
+            username : payload.username
+        },process.env.SECRET_ACCESS_KEY,{
+            expiresIn : "10m"
+        });
+        req.newAccessToken = newAccessToken;
+        return next()
+
+    }catch(e){
+        if(e.name == "TokenExpiredError"){
+            await Token.deleteOne({tokenId : getRefreshToken.tokenId});
+            return res.status(401).json({
+                ok : false,
+                message : "refresh token expired, please login again"
+            })
+        }else{
+            return res.status(500).json({
+                ok : false,
+                message : "internal server error"
+            })
+        }
+    }
 
 }
 
