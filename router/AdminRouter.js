@@ -17,6 +17,7 @@ router.post("/tambahpaket", authorizeUser, async (req,res) => {
             deskripsi : body.deskripsi,
             detailCatering : body.paketPlain === true ? undefined : {
                 hargaPerBuah : Number(body.detailCatering.hargaPerBuah) === NaN ? undefined : Number(body.detailCatering.hargaPerBuah),
+                gambar : body.detailCatering.gambar,
                 detailPaketCatering : body.detailCatering.detailPaketCatering
             }
         });

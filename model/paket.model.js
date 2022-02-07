@@ -10,10 +10,6 @@ const Paket = mongoose.Schema({
         maxLength : 300,
         required : [true, "kolom namaPaket harus di isi"]
     },
-    gambar : {
-        type : String,
-        required : [true, "kolom gambar harus di isi"],
-    },
     hargaAula : {
         type : Number,
         required : [true, "kolom hargaAula harus di isi"]
@@ -24,6 +20,10 @@ const Paket = mongoose.Schema({
         required : [true, "kolom deskripsi harus di isi"]
     },
     detailCatering : {
+        gambar : {
+            type : String,
+            required : function () {return this.paketPlain === false},
+        },
         hargaPerBuah : {
             type : Number,
             required : function () {return this.paketPlain === false}
