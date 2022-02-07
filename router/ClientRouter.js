@@ -31,6 +31,11 @@ router.post("/order/:paketId", async (req,res) => {
                 PilihanPaket : paketDoc,
                 detailPesanan : orderan
             })
+        }else{
+            res.json({
+                ok : false,
+                message : `tidak ada product dengan id ${paketId}`
+            })
         }
     }catch(e){
         if(e.name === "ValidationError"){
