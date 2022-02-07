@@ -57,11 +57,15 @@ const authorizeUser = async (req,res,next) => {
         req.detailUser = verifyIt;
         next();
     }catch(err){
-        console.log(err);
-        if(err.name == "JsonWebTokenError"){
+        if(err.name === "JsonWebTokenError"){
             return res.status(401).json({
                 ok : false,
                 message : "not authorized"
+            })
+        }else if(err.name === "TokenExpiredError"){
+            return res.status(401).json({
+                ok : false,
+                message : "token expired"
             })
         }
         return res.status(500).json({
@@ -135,5 +139,5 @@ module.exports = {
     authVerifLogin,
     authorizeUser,
     superAdminOnly,
-    generateRefreshToken
+    generateRefreshToken,
 }
