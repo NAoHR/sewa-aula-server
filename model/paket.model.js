@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const Paket = mongoose.Schema({
     paketPlain : {
         type : Boolean,
-        maxLength : 300,
         required : true
     },
     namaPaket : {
@@ -28,6 +27,7 @@ const Paket = mongoose.Schema({
         detailPaketCatering : {
             type : [{
                 type : String,
+                maxLength : 300,
                 required : function () {return this.paketPlain === false}
             }],
             required : function () {return this.paketPlain === false},
