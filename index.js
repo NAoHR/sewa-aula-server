@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const authRouter = require("./router/AuthRouter");
+const adminRouter = require("./router/AdminRouter");
+const clientRouter = require("./router/ClientRouter");
 
 const app = express();
 
@@ -13,6 +15,8 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({extended : true}));
 
 app.use("/auth",authRouter);
+app.use("/admin", adminRouter);
+app.use("/client",clientRouter);
 
 mongoose.connect(process.env.LOCAL_DEV_MONGO
     )
