@@ -8,19 +8,18 @@ const {
 
 router.post("/tambahpaket", authorizeUser, async (req,res) => {
     try{
-        console.log(req.body);
+        const body = req.body;
         const tambahPaket = new Paket({
-            paketPlain : req.body.paketPlain,
-            namaPaket : req.body.namaPaket,
-            hargaAula : Number(req.body.hargaAula),
-            gambar : req.body.gambar,
-            deskripsi : req.body.deskripsi,
-            detailCatering : req.body.paketPlain === true ? undefined : {
-                hargaPerBuah : Number(req.body.detailCatering.hargaPerBuah) === NaN ? undefined : Number(req.body.detailCatering.hargaPerBuah),
-                detailPaketCatering : req.body.detailCatering.detailPaketCatering
+            paketPlain : body.paketPlain,
+            namaPaket : body.namaPaket,
+            hargaAula : Number(body.hargaAula),
+            gambar : body.gambar,
+            deskripsi : body.deskripsi,
+            detailCatering : body.paketPlain === true ? undefined : {
+                hargaPerBuah : Number(body.detailCatering.hargaPerBuah) === NaN ? undefined : Number(body.detailCatering.hargaPerBuah),
+                detailPaketCatering : body.detailCatering.detailPaketCatering
             }
         });
-        console.log(tambahPaket)
         await tambahPaket.save();
         return res.json({
             ok : true,
