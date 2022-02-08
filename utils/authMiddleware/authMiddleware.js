@@ -135,9 +135,46 @@ const generateRefreshToken = async (req,res,next) => {
 
 }
 
+const isUserLoggedIn = async (req,res,next) => {
+    try{
+        const {refreshToken} = req.body;
+        if(refreshToken){
+            const findToken = await Token.findOne({
+                tokenId : refreshToken
+            })
+            if(findToken){
+                const verifyToken = jwt.verify(refreshToken,process.env.SECRET_REFRESH_KEY);
+                req.user = verifyToken;
+                return next();
+            }
+            return res.json({
+                ok : false,
+                message : "please login again"
+            })
+        }
+        return res.json({
+            ok : false,
+            message : "token tidak ada"
+        })
+    }catch(e){
+        if(e.name == "TokenExpiredError"){
+            return res.json({
+                ok : false,
+                message : "refresh token expired, please login again"
+            })
+        }else{
+            return res.json({
+                ok : false,
+                message : "internal error"
+            })
+        }
+    }
+}
+
 module.exports = {
     authVerifLogin,
     authorizeUser,
     superAdminOnly,
     generateRefreshToken,
+    isUserLoggedIn,
 }

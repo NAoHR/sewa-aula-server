@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const {
-    authVerifLogin,authorizeUser,superAdminOnly,generateRefreshToken
+    authVerifLogin,authorizeUser,superAdminOnly,generateRefreshToken,isUserLoggedIn
 } = require("../utils/authMiddleware/authMiddleware");
 
 const {
@@ -109,5 +109,9 @@ router.delete("/logout",async (req,res) => {
         return res.send("not ok")
     }
 })
+
+router.post("/loggedIn", isUserLoggedIn , (req,res) => {
+    return res.json(req.user);
+});
 
 module.exports = router;
