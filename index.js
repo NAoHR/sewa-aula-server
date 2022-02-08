@@ -18,7 +18,7 @@ app.use("/auth",authRouter);
 app.use("/admin", adminRouter);
 app.use("/client",clientRouter);
 
-mongoose.connect(process.env.LOCAL_DEV_MONGO
+mongoose.connect(process.env.NEWMONGO
     )
     .then(()=>{
         console.log("mongodb connected")

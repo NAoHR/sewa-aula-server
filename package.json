@@ -1,6 +1,10 @@
 {
   "name": "server-sewa-aula",
   "version": "1.0.0",
+  "engines": {
+    "node": "16.11.0",
+    "npm": "8.0.0"
+  },
   "description": "",
   "main": "index.js",
   "scripts": {
