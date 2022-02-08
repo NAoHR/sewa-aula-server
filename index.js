@@ -22,7 +22,7 @@ mongoose.connect(process.env.NEWMONGO
     )
     .then(()=>{
         console.log("mongodb connected")
-        app.listen(5000, () =>{
+        app.listen(process.env.PORT, () =>{
             console.log("express server started");
         })
     })
