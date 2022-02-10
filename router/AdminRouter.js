@@ -1,9 +1,11 @@
 const express = require("express");
 const Paket = require("../model/paket.model");
+const Order = require("../model/order.model")
 const bcrypt = require("bcrypt");
 const router = express.Router();
-const {Admin} = require("../model/admin.model");
+const url = require('url');
 
+const {Admin} = require("../model/admin.model");
 const {
     authorizeUser,superAdminOnly
 } = require("../utils/authMiddleware/authMiddleware");
@@ -89,6 +91,40 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
         ok : false,
         message : "tidak valid"
     })
+})
+
+router.get("/getalldata",authorizeUser, async (req,res) => {
+    const urlParam = url.parse(req.url,true);
+    const query = urlParam.query;
+    try{
+        let tobeReturned = {};
+
+        switch(query["q"]){
+            case "paket":
+                tobeReturned["paket"] = await Paket.find();
+                break
+            case "order":
+                tobeReturned["order"] = await Order.find();
+            default:
+                let paketDocs = await Order.find();
+                let orderdocs = await Paket.find();
+                tobeReturned = {
+                    paket : paketDocs,
+                    order : orderdocs
+                }
+                break
+        }
+        return res.json({
+            ok : true,
+            data : tobeReturned
+        })
+    }catch(e){
+        console.log(e);
+        return res.json({
+            ok : false,
+            message : "internal error"
+        })
+    }
 })
 
 
