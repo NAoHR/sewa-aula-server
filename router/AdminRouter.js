@@ -106,8 +106,8 @@ router.get("/getalldata",authorizeUser, async (req,res) => {
             case "order":
                 tobeReturned["order"] = await Order.find();
             default:
-                let paketDocs = await Order.find();
-                let orderdocs = await Paket.find();
+                let paketDocs = await Paket.find();
+                let orderdocs = await Order.find();
                 tobeReturned = {
                     paket : paketDocs,
                     order : orderdocs
