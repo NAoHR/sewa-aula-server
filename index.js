@@ -1,8 +1,7 @@
 const bodyParser = require("body-parser");
 const express = require("express");
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
+const cors = require("cors");
 require("dotenv").config();
 
 const authRouter = require("./router/AuthRouter");
@@ -10,6 +9,10 @@ const adminRouter = require("./router/AdminRouter");
 const clientRouter = require("./router/ClientRouter");
 
 const app = express();
+app.use(cors({
+    origin : "*",
+    credentials : true
+}))
 
 app.use(express.json());
 app.use(bodyParser.urlencoded({extended : true}));
