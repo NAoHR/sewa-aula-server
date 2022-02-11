@@ -20,9 +20,9 @@ router.post("/tambahpaket", authorizeUser, async (req,res) => {
             gambar : body.gambar,
             deskripsi : body.deskripsi,
             detailCatering : body.paketPlain === true ? undefined : {
+                gambar : body.detailCatering.gambar ? body.detailCatering.gambar : undefined,
                 hargaPerBuah : Number(body.detailCatering.hargaPerBuah) === NaN ? undefined : Number(body.detailCatering.hargaPerBuah),
-                gambar : body.detailCatering.gambar,
-                detailPaketCatering : body.detailCatering.detailPaketCatering
+                detailPaketCatering : body.detailCatering.detailPaketCatering ? body.detailCatering.detailPaketCatering : undefined
             }
         });
         await tambahPaket.save();
@@ -127,5 +127,36 @@ router.get("/getalldata",authorizeUser, async (req,res) => {
     }
 })
 
+router.post("/edit/paket/:paketId",async (req,res)=>{
+    const {paketId} = req.params;
+    if(paketId){
+        try{
+            let update = await Paket.updateOne({_id : paketId},req.body,{
+                runValidators : true
+            })
+            return res.status(200).json({
+                ok : true,
+                message : "berhasil dirubah",
+                data : update
+            })
+        }catch(e){
+            if(e.name === "ValidationError"){
+                return res.json({
+                    ok : false,
+                    message : e.message
+                })
+            }
+            console.log(e);
+            return res.status(500).json({
+                ok : false,
+                message : "internal error"
+            })
+        }
+    }
+    return res.json({
+        ok : false,
+        message : "masukkan id ke /edit/paket/id"
+    })
+})
 
 module.exports = router;
