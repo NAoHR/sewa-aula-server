@@ -20,7 +20,7 @@ router.post("/order/:paketId", async (req,res) => {
                 email : detail.email,
                 whatsapp : detail.whatsapp,
                 jumlahPorsi : paketDoc.paketPlain === true ? undefined : detail.jumlahPorsi,
-                tanggal : detail.tanggal,
+                tanggal : new Date(Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"}),
                 status : "order"
             })
 
@@ -48,7 +48,7 @@ router.post("/order/:paketId", async (req,res) => {
     }
 })
 
-router.get("/getOrder/:orderId",async (req,res)=>{
+router.get("/getorder/:orderId",async (req,res)=>{
     try{
         const {orderId} = req.params;
         let orderDetail = await Order.findById(orderId);
@@ -79,9 +79,46 @@ router.get("/getOrder/:orderId",async (req,res)=>{
     }
 })
 
+router.get("/getpaket/:paketId", async (req,res) => {
+    const {paketId} = req.params;
+    try{
+        const paketDetail = await Paket.findById(paketId);
+        if(paketDetail){
+            return res.status(200).json({
+                ok : true,
+                data : paketDetail
+            })
+        }
+        return res.json({
+            ok : false,
+            message : "paket tidak ditemukan",
+            data : {}
+        })
+    }catch(e){
+        return res.status(500).json({
+            ok : false,
+            message : "internal error"
+        })
+    }
+})
+
 router.get("/getalldata", async (req,res) => {
     const urlParam = url.parse(req.url,true);
     const query = urlParam.query;
+
+    const parseItiftypeExist = (data,key) => {
+        let list = []
+        if(key){
+            data.forEach((item)=>{
+                if(item[key] !== undefined){
+                    list.push(item[key])
+                }
+            })
+            return list;
+        }
+        return data;
+    }
+
     try{
         let tobeReturned = {};
         const hideCreds = (data) => {
@@ -90,7 +127,7 @@ router.get("/getalldata", async (req,res) => {
                     let hideEmail = val["email"].split("@")
                     return {
                         "_id": val._id,
-                        "paketId": val.packetId,
+                        "paketId": val.paketId,
                         "tipeOrderan": val.tipeOrderan,
                         "atasNama": val.atasNama,
                         "email": `${hideEmail[0].slice(0,2)}${"*".repeat(hideEmail[0].length -2)}@${hideEmail[1]}`,
@@ -105,17 +142,18 @@ router.get("/getalldata", async (req,res) => {
         }
         switch(query["q"]){
             case "paket":
-                tobeReturned["paket"] = await Paket.find()
+                tobeReturned["paket"] = parseItiftypeExist(await Paket.find(),query["key"])
                 break
             case "order":
-                tobeReturned["order"] = hideCreds(await Order.find());
+                tobeReturned["order"] = parseItiftypeExist(hideCreds(await Order.find()),query["key"]);
                 break
             default:
                 let paketDocs = await Paket.find();
+                console.log(paketDocs)
                 let orderdocs = hideCreds(await Order.find());
                 tobeReturned = {
-                    paket : paketDocs,
-                    order : orderdocs
+                    paket : parseItiftypeExist(paketDocs,query["key"]),
+                    order : parseItiftypeExist(orderdocs,query["key"])
                 }
                 break
         }
