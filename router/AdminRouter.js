@@ -127,7 +127,7 @@ router.get("/getalldata",authorizeUser, async (req,res) => {
     }
 })
 
-router.post("/edit/paket/:paketId",async (req,res)=>{
+router.post("/edit/paket/:paketId", authorizeUser,async (req,res)=>{
     const {paketId} = req.params;
     if(paketId){
         try{

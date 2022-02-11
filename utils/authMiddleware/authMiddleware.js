@@ -50,7 +50,7 @@ const authorizeUser = async (req,res,next) => {
         if(req.headers.jwt === undefined){
             return res.status(403).json({
                 ok : false,
-                message : "dilarang"
+                message : "token tidak ditemukan"
             })
         }
         const verifyIt = await jwt.verify(req.headers.jwt,process.env.SECRET_ACCESS_KEY)
