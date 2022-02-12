@@ -140,13 +140,12 @@ router.post("/edit/paket/:paketId", authorizeUser,async (req,res)=>{
                 data : update
             })
         }catch(e){
-            if(e.name === "ValidationError"){
+            if(e.name === "ValidationError" || e.name === "Error"){
                 return res.json({
                     ok : false,
                     message : e.message
                 })
             }
-            console.log(e);
             return res.status(500).json({
                 ok : false,
                 message : "internal error"
@@ -159,4 +158,35 @@ router.post("/edit/paket/:paketId", authorizeUser,async (req,res)=>{
     })
 })
 
+router.post("/edit/order/:paketId", authorizeUser,async (req,res)=>{
+    const {paketId} = req.params;
+    if(paketId){
+        try{
+            let update = await Order.updateOne({_id : paketId},req.body,{
+                runValidators : true
+            })
+            return res.status(200).json({
+                ok : true,
+                message : "berhasil dirubah",
+                data : update
+            })
+        }catch(e){
+            console.log(e);
+            if(e.name === "ValidationError" || e.name === "Error"){
+                return res.json({
+                    ok : false,
+                    message : e.message
+                })
+            }
+            return res.status(500).json({
+                ok : false,
+                message : "internal error"
+            })
+        }
+    }
+    return res.json({
+        ok : false,
+        message : "masukkan id ke /edit/paket/id"
+    })
+})
 module.exports = router;

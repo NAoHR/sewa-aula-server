@@ -1,9 +1,15 @@
 const mongoose = require("mongoose");
+const Paket = require("./paket.model");
+
 
 const OrderScheme = mongoose.Schema({
     paketId : {
         type : mongoose.ObjectId,
         required :  [true, "kolom paketId harus di isi"]
+    },
+    namaAcara : {
+        type : String,
+        required :  [true, "kolom namaAcara harus di isi"]
     },
     tipeOrderan : {
         type : String,
@@ -26,10 +32,10 @@ const OrderScheme = mongoose.Schema({
     },
     jumlahPorsi : {
         type : Number,
+        min : 30,
         required: function () {
             return this.tipeOrderan === "paket";
-        },
-        default : undefined
+        }
     },
     tanggal : {
         type : Date,
@@ -40,5 +46,42 @@ const OrderScheme = mongoose.Schema({
         enum : ["order","selesai","batal","paid"],
         required : [true, "kolom status harus di isi"]
     },
+})
+
+OrderScheme.pre("updateOne",async function(next){
+    const doc = await this.model.findOne(this.getQuery());
+    
+    let {paketId,tipeOrderan} = this._update;
+    if(paketId || tipeOrderan){
+        try{
+            let paketDoc = await Paket.findById(paketId);
+            if(paketDoc){
+                let validator = tipeOrderan === "plain" ? true : false;
+                if(paketDoc.paketPlain === validator){
+                    if(paketDoc.paketPlain === true){
+                        doc.tipeOrderan = "plain"
+                        doc.jumlahPorsi = undefined;
+                        doc.save();
+                        return next();
+                    }else{
+                        this._update.tipeOrderan = "paket";
+                        if(this._update.jumlahPorsi === undefined){
+                            return next(new Error("jumlah porsi harus di isi"));
+                        }
+                        doc.jumlahPorsi = this._update.jumlahPorsi;
+                        doc.save();
+                        return next()
+                    }
+                }else{
+                    return next(new Error("jika ingin mengganti paket, tipeOrderan dan paketId harus bernilai sama\ncontoh : paketPlain === true harus sama dengan tipeOrderan === plain"))    
+                }
+            }else{
+                return next(new Error("jika ingin mengganti paket, masukkan juga paketId"))
+            }
+        }catch(e){
+            return next(new Error(e.message))
+        }
+    }
+    return next()
 })
 module.exports = mongoose.model("OrderProduct",OrderScheme);
