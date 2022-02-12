@@ -15,6 +15,7 @@ router.post("/order/:paketId", async (req,res) => {
             const detail = req.body;
             const orderan = new Order({
                 paketId : paketId,
+                namaAcara : detail.namaAcara,
                 tipeOrderan : paketDoc.paketPlain === true ? "plain" : "paket",
                 atasNama : detail.atasNama,
                 email : detail.email,
@@ -45,6 +46,11 @@ router.post("/order/:paketId", async (req,res) => {
                 message : e.message
             })
         }
+        console.log(e);
+        return res.status(500).json({
+            ok : false,
+            message : "internal error"
+        })
     }
 })
 
@@ -127,13 +133,13 @@ router.get("/getalldata", async (req,res) => {
                     let hideEmail = val["email"].split("@")
                     return {
                         "_id": val._id,
+                        "namaAcara" : val.namaAcara,
                         "paketId": val.paketId,
                         "tipeOrderan": val.tipeOrderan,
                         "atasNama": val.atasNama,
                         "email": `${hideEmail[0].slice(0,2)}${"*".repeat(hideEmail[0].length -2)}@${hideEmail[1]}`,
-                        "nomor" : val["whatsapp"],
                         "whatsapp": `${val["whatsapp"].slice(0,2)}${"*".repeat(val["whatsapp"].length -4)}${val["whatsapp"].slice(-2)}`,
-                        "jumlahPorsi": val.porsi,
+                        "jumlahPorsi": val.jumlahPorsi,
                         "tanggal": val.tanggal,
                         "status": val.status,
                     }
@@ -149,7 +155,6 @@ router.get("/getalldata", async (req,res) => {
                 break
             default:
                 let paketDocs = await Paket.find();
-                console.log(paketDocs)
                 let orderdocs = hideCreds(await Order.find());
                 tobeReturned = {
                     paket : parseItiftypeExist(paketDocs,query["key"]),
