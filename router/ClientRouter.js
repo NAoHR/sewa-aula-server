@@ -16,12 +16,12 @@ router.post("/order/:paketId", async (req,res) => {
             const orderan = new Order({
                 paketId : paketId,
                 namaAcara : detail.namaAcara,
-                tipeOrderan : paketDoc.paketPlain === true ? "plain" : "paket",
+                tipeOrderan : paketDoc.paketPlain ? "plain" : "paket",
                 atasNama : detail.atasNama,
                 email : detail.email,
                 whatsapp : detail.whatsapp,
-                jumlahPorsi : paketDoc.paketPlain === true ? undefined : detail.jumlahPorsi,
-                tanggal : new Date(Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"}),
+                jumlahPorsi : paketDoc.paketPlain ? undefined : detail.jumlahPorsi,
+                tanggal : new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"}),
                 status : "order"
             })
 
