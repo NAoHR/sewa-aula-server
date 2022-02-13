@@ -22,7 +22,8 @@ router.post("/order/:paketId", async (req,res) => {
                 whatsapp : detail.whatsapp,
                 jumlahPorsi : paketDoc.paketPlain ? undefined : detail.jumlahPorsi,
                 tanggal : new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"}),
-                status : "order"
+                status : "order",
+                createdAt : new Date().toLocaleDateString({timeZone : "Asia/Jakarta"})
             })
 
             await orderan.save();
@@ -125,11 +126,11 @@ router.get("/getalldata", async (req,res) => {
         return data;
     }
 
-    try{
-        let tobeReturned = {};
-        const hideCreds = (data) => {
-            if(data){
-                return data.map((val)=>{
+    const hideCreds = (data) => {
+        if(data){
+            return data
+                .filter((item) => item.status === "order")
+                .map((val) => {
                     let hideEmail = val["email"].split("@")
                     return {
                         "_id": val._id,
@@ -143,9 +144,12 @@ router.get("/getalldata", async (req,res) => {
                         "tanggal": val.tanggal,
                         "status": val.status,
                     }
-                })
-            }
+                });
         }
+    }
+
+    try{
+        let tobeReturned = {};
         switch(query["q"]){
             case "paket":
                 tobeReturned["paket"] = parseItiftypeExist(await Paket.find(),query["key"])

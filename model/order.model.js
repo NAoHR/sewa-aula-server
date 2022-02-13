@@ -39,6 +39,7 @@ const OrderScheme = mongoose.Schema({
     },
     tanggal : {
         type : Date,
+        unique : true,
         required : [true, "kolom tanggal harus di isi"]
     },
     status : {
@@ -46,6 +47,10 @@ const OrderScheme = mongoose.Schema({
         enum : ["order","selesai","batal","paid"],
         required : [true, "kolom status harus di isi"]
     },
+    createdAt : {
+        type : Date,
+        required : true
+    }
 })
 
 OrderScheme.pre("updateOne",async function(next){
@@ -83,5 +88,22 @@ OrderScheme.pre("updateOne",async function(next){
         }
     }
     return next()
+})
+
+OrderScheme.post("init", async function(doc){
+    try{
+        const netDate = new Date().setHours(0,0,0,0);
+        const createdDate = new Date(doc.tanggal).getTime();
+        if(netDate - createdDate > 172800000){
+            if(["batal","selesai","paid"].indexOf(doc.status) == -1){
+                console.log(doc)
+                doc.status = "batal";
+                await doc.save();
+            }
+        }
+        return doc
+    }catch(e){
+        return false
+    }
 })
 module.exports = mongoose.model("OrderProduct",OrderScheme);
