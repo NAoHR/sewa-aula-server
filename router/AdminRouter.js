@@ -93,6 +93,25 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
     })
 })
 
+router.get("/getalldata/order-paid", authorizeUser, async (req,res) => {
+    try{
+        const paket = await Paket.find();
+        const order = await Order.find();
+        return res.status(200).json({
+            ok : true,
+            data : {
+                paket : paket,
+                order : order.filter(item => item.status == "paid" || item.statys == "order")
+            }
+        })
+    }catch(e){
+        return res.status(500).json({
+            ok : false,
+            message : "internal error"
+        })
+    }
+})
+
 router.get("/getalldata",authorizeUser, async (req,res) => {
     const urlParam = url.parse(req.url,true);
     const query = urlParam.query;
