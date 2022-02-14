@@ -211,4 +211,50 @@ router.post("/edit/order/:paketId", authorizeUser,async (req,res)=>{
         message : "masukkan id ke /edit/paket/id"
     })
 })
+
+router.get("/delete/order/:orderId", authorizeUser,async (req,res) => {
+    const {orderId} = req.params;
+    try{
+        const deleteOrder = await Order.deleteOne({_id : orderId});
+        if(deleteOrder.deletedCount === 1){
+            return res.status(200).json({
+                ok : true,
+                message : `${orderId} ter-delete`
+            })
+        }
+        return res.status(500).json({
+            ok : false,
+            message : "tidak ada di dalam database"
+        })
+    }catch(e){
+        console.log(e);
+        return res.status(406).json({
+            ok : false,
+            message : "internal error"
+        })
+    }
+})
+
+router.get("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
+    const {paketId} = req.params;
+    try{
+        const deletePaket = await Paket.deleteOne({_id : paketId});
+        if(deletePaket.deletedCount === 1){
+            return res.status(200).json({
+                ok : true,
+                message : `${paketId} terhapus`
+            })
+        }
+        return res.status(500).json({
+            ok : false,
+            message : "tidak ada di dalam database"
+        })
+    }catch(e){
+        console.log(e);
+        return res.status(406).json({
+            ok : false,
+            message : "internal error"
+        })
+    }
+})
 module.exports = router;
