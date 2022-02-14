@@ -157,14 +157,14 @@ router.get("/getalldata", async (req,res) => {
             case "order":
                 let order = await await Order.find();
                 tobeReturned["active"] = hideCreds(order.filter((item) => item.active === true))
-                tobeReturned["order"] = parseItiftypeExist(hideCreds(order.filter((item) => item.status === "order")),query["key"]);
+                tobeReturned["order"] = parseItiftypeExist(hideCreds(order.filter((item) => item.status == "order" || item.status == "paid")),query["key"]);
                 break
             default:
                 let paketDocs = await Paket.find();
                 let orderdocs = await Order.find();
                 tobeReturned = {
                     paket : parseItiftypeExist(paketDocs,query["key"]),
-                    order : parseItiftypeExist(hideCreds(orderdocs.filter((item) => item.status === "order")),query["key"]),
+                    order : parseItiftypeExist(hideCreds(orderdocs.filter((item) => item.status == "order" || item.status == "paid")),query["key"]),
                     active : hideCreds(orderdocs.filter((item) => item.active === true))
                 }
                 break
