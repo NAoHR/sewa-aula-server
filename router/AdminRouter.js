@@ -101,7 +101,7 @@ router.get("/getalldata/order-paid", authorizeUser, async (req,res) => {
             ok : true,
             data : {
                 paket : paket,
-                order : order.filter(item => item.status == "paid" || item.statys == "order")
+                order : order.filter(item => item.status == "paid" || item.status == "order")
             }
         })
     }catch(e){
