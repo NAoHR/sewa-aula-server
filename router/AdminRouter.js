@@ -98,19 +98,23 @@ router.get("/getalldata",authorizeUser, async (req,res) => {
     const query = urlParam.query;
     try{
         let tobeReturned = {};
-
         switch(query["q"]){
             case "paket":
-                tobeReturned["paket"] = await Paket.find();
+                let paket = await Paket.find()
+                tobeReturned["paket"] = paket;
                 break
             case "order":
-                tobeReturned["order"] = await Order.find();
+                let order = await Order.find();
+                tobeReturned["order"] = order;
+                tobeReturned["active"] = order.filter((item) => item.active === true)
+                break
             default:
                 let paketDocs = await Paket.find();
                 let orderdocs = await Order.find();
                 tobeReturned = {
                     paket : paketDocs,
-                    order : orderdocs
+                    order : orderdocs,
+                    active : orderdocs.filter((item) => item.active === true)
                 }
                 break
         }
@@ -119,7 +123,6 @@ router.get("/getalldata",authorizeUser, async (req,res) => {
             data : tobeReturned
         })
     }catch(e){
-        console.log(e);
         return res.json({
             ok : false,
             message : "internal error"

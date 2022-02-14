@@ -93,13 +93,20 @@ OrderScheme.pre("updateOne",async function(next){
 OrderScheme.post("init", async function(doc){
     try{
         const netDate = new Date().setHours(0,0,0,0);
-        const createdDate = new Date(doc.tanggal).getTime();
+        const createdDate = new Date(doc.createdAt).getTime();
+        const tanggal = new Date(doc.tanggal).getTime();
         if(netDate - createdDate > 172800000){
             if(["batal","selesai","paid"].indexOf(doc.status) == -1){
-                console.log(doc)
                 doc.status = "batal";
                 await doc.save();
             }
+        }
+        if(netDate === tanggal && doc.status === "paid"){
+            doc.active = true;
+        }
+        if(netDate > tanggal && doc.status === "paid"){
+            doc.status = "selesai";
+            await doc.save();
         }
         return doc
     }catch(e){

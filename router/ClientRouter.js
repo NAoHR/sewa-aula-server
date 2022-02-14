@@ -10,7 +10,6 @@ router.post("/order/:paketId", async (req,res) => {
     try{
         const {paketId} = req.params;
         const paketDoc = await Paket.findById(paketId);
-        console.log(paketDoc);
         if(paketDoc){
             const detail = req.body;
             const orderan = new Order({
@@ -41,7 +40,7 @@ router.post("/order/:paketId", async (req,res) => {
             })
         }
     }catch(e){
-        if(e.name === "ValidationError"){
+        if(e.name === "ValidationError" || e.name === "MongoServerError"){
             return res.status(401).json({
                 ok : false,
                 message : e.message
@@ -60,7 +59,6 @@ router.get("/getorder/:orderId",async (req,res)=>{
         const {orderId} = req.params;
         let orderDetail = await Order.findById(orderId);
         if(orderDetail){
-            console.log(orderDetail,"sini");
             let paketfromOrder = await Paket.findById(orderDetail.paketId);
             return res.json({
                 ok : true,
@@ -129,7 +127,6 @@ router.get("/getalldata", async (req,res) => {
     const hideCreds = (data) => {
         if(data){
             return data
-                .filter((item) => item.status === "order")
                 .map((val) => {
                     let hideEmail = val["email"].split("@")
                     return {
@@ -155,14 +152,17 @@ router.get("/getalldata", async (req,res) => {
                 tobeReturned["paket"] = parseItiftypeExist(await Paket.find(),query["key"])
                 break
             case "order":
-                tobeReturned["order"] = parseItiftypeExist(hideCreds(await Order.find()),query["key"]);
+                let order = await await Order.find();
+                tobeReturned["active"] = hideCreds(order.filter((item) => item.active === true))
+                tobeReturned["order"] = parseItiftypeExist(hideCreds(order.filter((item) => item.status === "order")),query["key"]);
                 break
             default:
                 let paketDocs = await Paket.find();
-                let orderdocs = hideCreds(await Order.find());
+                let orderdocs = await Order.find();
                 tobeReturned = {
                     paket : parseItiftypeExist(paketDocs,query["key"]),
-                    order : parseItiftypeExist(orderdocs,query["key"])
+                    order : parseItiftypeExist(hideCreds(orderdocs.filter((item) => item.status === "order")),query["key"]),
+                    active : hideCreds(orderdocs.filter((item) => item.active === true))
                 }
                 break
         }
