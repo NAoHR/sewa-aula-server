@@ -10,8 +10,11 @@ router.post("/order/:paketId", async (req,res) => {
     try{
         const {paketId} = req.params;
         const paketDoc = await Paket.findById(paketId);
+
         if(paketDoc){
             const detail = req.body;
+            const newDate = new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).setHours(0,0,0,0)
+
             const orderan = new Order({
                 paketId : paketId,
                 namaAcara : detail.namaAcara,
@@ -20,7 +23,7 @@ router.post("/order/:paketId", async (req,res) => {
                 email : detail.email,
                 whatsapp : detail.whatsapp,
                 jumlahPorsi : paketDoc.paketPlain ? undefined : detail.jumlahPorsi,
-                tanggal : new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"}),
+                tanggal : newDate,
                 status : "order",
                 createdAt : new Date().toLocaleDateString({timeZone : "Asia/Jakarta"})
             })
