@@ -212,7 +212,7 @@ router.post("/edit/order/:paketId", authorizeUser,async (req,res)=>{
     })
 })
 
-router.get("/delete/order/:orderId", authorizeUser,async (req,res) => {
+router.delete("/delete/order/:orderId", authorizeUser,async (req,res) => {
     const {orderId} = req.params;
     try{
         const deleteOrder = await Order.deleteOne({_id : orderId});
@@ -235,7 +235,7 @@ router.get("/delete/order/:orderId", authorizeUser,async (req,res) => {
     }
 })
 
-router.get("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
+router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
     const {paketId} = req.params;
     try{
         const deletePaket = await Paket.deleteOne({_id : paketId});
