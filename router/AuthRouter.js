@@ -24,11 +24,15 @@ router.post("/refreshToken",generateRefreshToken, (req,res) => {
     try{
         return res.status(200).json(
             {
+                ok : true,
                 accessToken : req.newAccessToken
             }
         );
     }catch(e){
-        console.log(e)
+        return res.json({
+            ok : false,
+            message : "internal error"
+        })
     }
 })
 
@@ -53,12 +57,22 @@ router.delete("/logout",async (req,res) => {
         return res.send("please insert tokenb");
     }catch(e){
         console.log(e);
-        return res.send("not ok")
+        return res.json({
+            ok : false,
+            message : "internal error"
+        })
     }
 })
 
 router.post("/loggedIn", isUserLoggedIn , (req,res) => {
-    return res.json(req.user);
+    try{
+        return res.json(req.user);
+    }catch(e){
+        return res.status(500).json({
+            ok : false,
+            message : "internal error"
+        })
+    }
 });
 
 module.exports = router;

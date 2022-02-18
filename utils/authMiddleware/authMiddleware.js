@@ -32,9 +32,10 @@ const authVerifLogin = async (req,res,next) => {
                 "message" : "tidak memenuhi kriteria username ataupun password"
             });
         }catch(Err){
+            console.log(Err);
             return res.status(400).json({
                 ok : false,
-                "message" : "server tidak berjalan"
+                "message" : "internal error"
             });
         }
     }
@@ -111,7 +112,9 @@ const generateRefreshToken = async (req,res,next) => {
         const payload = await jwt.verify(getRefreshToken.tokenId,process.env.SECRET_REFRESH_KEY);
         const newAccessToken = await jwt.sign({
             id : payload.id,
-            username : payload.username
+            username : payload.username,
+            role : payload.role
+
         },process.env.SECRET_ACCESS_KEY,{
             expiresIn : "10m"
         });
@@ -170,6 +173,7 @@ const isUserLoggedIn = async (req,res,next) => {
         }
     }
 }
+
 
 module.exports = {
     authVerifLogin,
