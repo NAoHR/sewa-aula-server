@@ -7,7 +7,7 @@ const url = require('url');
 
 const {Admin} = require("../model/admin.model");
 const {
-    authorizeUser,superAdminOnly
+    authorizeUser,superAdminOnly, isUserLoggedIn
 } = require("../utils/authMiddleware/authMiddleware");
 
 router.post("/tambahpaket", authorizeUser, async (req,res) => {
@@ -92,6 +92,53 @@ router.post("/addAdmin", authorizeUser , superAdminOnly ,async (req,res) =>{
         message : "tidak valid"
     })
 })
+
+router.post("/edit/admin/:adminId",authorizeUser, async (req,res) => {
+    try{
+        const {adminId} = req.params;
+
+        const updateIt = async (details) => {
+            let updateAdmin = await Admin.updateOne({_id : adminId},
+                details,{
+                    runValidators : true
+                });
+            console.log(updateAdmin)
+            return res.send("ok")
+        }
+
+        if(adminId){
+            if(adminId == req.detailUser._id){
+                return await updateIt(req.body);
+
+            }else if(req.detailUser.role == "super_admin" && adminId != req.detailUser._id){
+                return await updateIt(req.body);
+            }
+            console.log(req.detailUser);
+            return res.status(401).json({
+                ok : false,
+                message : "not authorized"
+            })
+        }
+        return res.status(404).json({
+            ok : false,
+            message : "id tidak ada"
+        })
+    }catch(e){
+        console.log(e);
+        return res.status(501).json({
+            ok : "false",
+            message : "internal error"
+        })
+    }
+})
+
+
+
+
+// ALL ABOUT PAKET AND ORDER STUFF
+
+
+
 
 router.get("/getalldata/order-paid", authorizeUser, async (req,res) => {
     try{
