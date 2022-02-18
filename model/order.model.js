@@ -56,8 +56,8 @@ const OrderScheme = mongoose.Schema({
 OrderScheme.pre("updateOne",async function(next){
     const doc = await this.model.findOne(this.getQuery());
     
-    let {paketId,tipeOrderan} = this._update;
-    if(paketId || tipeOrderan){
+    let {paketId,tipeOrderan, jumlahPorsi} = this._update;
+    if(paketId || tipeOrderan || jumlahPorsi){
         try{
             let paketDoc = await Paket.findById(paketId);
             if(paketDoc){
@@ -81,6 +81,9 @@ OrderScheme.pre("updateOne",async function(next){
                     return next(new Error("jika ingin mengganti paket, tipeOrderan dan paketId harus bernilai sama\ncontoh : paketPlain === true harus sama dengan tipeOrderan === plain"))    
                 }
             }else{
+                if(jumlahPorsi){
+                    return next(new Error("anda mendefiniskan jumlahPorsi tapi tidak mendefinisika paketID"))
+                }
                 return next(new Error("jika ingin mengganti paket, masukkan juga paketId"))
             }
         }catch(e){

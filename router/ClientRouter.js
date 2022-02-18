@@ -2,7 +2,7 @@ const express = require("express");
 
 const Order = require("../model/order.model");
 const Paket = require("../model/paket.model")
-const router = express.Router("/");
+const router = express.Router();
 const url = require('url');
 
 
