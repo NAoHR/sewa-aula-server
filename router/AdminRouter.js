@@ -285,20 +285,57 @@ router.delete("/delete/order/:orderId", authorizeUser,async (req,res) => {
 router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
     const {paketId} = req.params;
     try{
-        const deletePaket = await Paket.deleteOne({_id : paketId});
-        if(deletePaket.deletedCount === 1){
-            return res.status(200).json({
-                ok : true,
-                message : `${paketId} terhapus`
-            })
+
+        const toBeDeletedPacket = await Paket.find({_id : paketId});
+
+        if(toBeDeletedPacket){
+
+            const relatedOrderDoc = await Order.find({paketId : paketId});
+            const urlParams = url.parse(req.url,true)
+            const params = urlParams.query;
+            
+            if(Number(params["force"]) === 1){
+                let tdPaket = await Paket.deleteOne({_id : paketId});
+                let tdOrder = await Order.deleteMany({ paketId : paketId});
+                return res.status(200).json({
+                    ok : true,
+                    message : "paket dan order berhasil terhapus",
+                    detail : {
+                        paket : {
+                            status : tdPaket,
+                            data : toBeDeletedPacket
+                        },
+                        order : {
+                            status : tdOrder,
+                            data : relatedOrderDoc
+                        }
+                    }
+                })
+            }else{
+                if(relatedOrderDoc.length > 0){
+                    return res.json({
+                        ok : true,
+                        message : `terdapat ${relatedOrderDoc.length} item yang akan bergantung pada id ini`
+                    })
+                }else{
+                    let deletePaket = await Paket.deleteOne({_id : paketId});
+
+                    return res.json({
+                        ok : true,
+                        message : "paket berhasil terhapus"
+                    })
+                }
+            }
         }
-        return res.status(500).json({
+        return res.json({
             ok : false,
-            message : "tidak ada di dalam database"
+            message : "paket tidak ditemukan"
         })
+
+
     }catch(e){
         console.log(e);
-        return res.status(406).json({
+        return res.status(501).json({
             ok : false,
             message : "internal error"
         })
