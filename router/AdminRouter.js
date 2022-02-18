@@ -200,7 +200,7 @@ router.post("/edit/paket/:paketId", authorizeUser,async (req,res)=>{
     const {paketId} = req.params;
     if(paketId){
         try{
-            let update = await Paket.updateOne({_id : paketId},req.body,{
+            let update = await Paket.updateOne({_id : String(paketId)},req.body,{
                 runValidators : true
             })
             return res.status(200).json({
@@ -227,11 +227,11 @@ router.post("/edit/paket/:paketId", authorizeUser,async (req,res)=>{
     })
 })
 
-router.post("/edit/order/:paketId", authorizeUser,async (req,res)=>{
-    const {paketId} = req.params;
-    if(paketId){
+router.post("/edit/order/:orderId", authorizeUser,async (req,res)=>{
+    const {orderId} = req.params;
+    if(orderId){
         try{
-            let update = await Order.updateOne({_id : paketId},req.body,{
+            let update = await Order.updateOne({_id : String(orderId)},req.body,{
                 runValidators : true
             })
             return res.status(200).json({
