@@ -28,7 +28,8 @@ router.post("/tambahpaket", authorizeUser, async (req,res) => {
         await tambahPaket.save();
         return res.json({
             ok : true,
-            message : "data berhasil ditambahkan"
+            message : "data berhasil ditambahkan",
+			data : tambahPaket
         });
     }catch(e){
         console.log(e)
