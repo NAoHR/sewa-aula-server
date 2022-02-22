@@ -68,4 +68,14 @@ Paket.pre("updateOne", async function(next) {
     }
 })
 
+Paket.pre("save", function(next){
+    const {
+        paketPlain,namaPaket,hargaAula,deskripsi
+    } = this;
+    if([paketPlain,namaPaket,hargaAula,deskripsi].indexOf(undefined) === -1){
+        return next();
+    }
+    return next(new Error("komponen utama tidak diisi dengan benar"));
+})
+
 module.exports = mongoose.model("pakets",Paket);
