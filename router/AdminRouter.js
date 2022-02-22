@@ -17,7 +17,6 @@ router.post("/tambahpaket", authorizeUser, async (req,res) => {
             paketPlain : body.paketPlain,
             namaPaket : body.namaPaket,
             hargaAula : Number(body.hargaAula),
-            gambar : body.gambar,
             deskripsi : body.deskripsi,
             detailCatering : body.paketPlain === true ? undefined : {
                 gambar : body.detailCatering.gambar ? body.detailCatering.gambar : undefined,
@@ -33,16 +32,28 @@ router.post("/tambahpaket", authorizeUser, async (req,res) => {
         });
     }catch(e){
         console.log(e)
-        if(e.name == "ValidationError" || e.name === "TypeError"){
-            return res.status(401).json({
-                ok : false,
-                message : e.message
-            })
-        }else{
-            res.status(500).json({
-                ok : false,
-                message : "internal error"
-            })
+        switch(e.name){
+            case "TypeError":
+                return res.status(401).json({
+                    ok : false,
+                    message : e.message
+                })
+            case "ValidationError":
+                const errMessage = e.message.split(": ")
+                return res.status(401).json({
+                    ok : false,
+                    message : errMessage[errMessage.length -1]
+                });
+            case "Error":
+                return res.json({
+                    ok : false,
+                    message : e.message
+                })
+            default:
+                res.status(500).json({
+                    ok : false,
+                    message : "internal error"
+                })
         }
     }
 })
