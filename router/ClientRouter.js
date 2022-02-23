@@ -110,6 +110,66 @@ router.get("/getpaket/:paketId", async (req,res) => {
     }
 })
 
+router.get("/avDate", async (req,res) => {
+    const urlParam = url.parse(req.url,true);
+    const {month,year} = urlParam.query;
+
+    try {
+        if(Number(month) && Number(year)){
+            let validMonth = month % 12
+            if(year >= new Date().getFullYear()){
+                const orderDocs = await Order.find({status : {$in : ["order","paid"]}})
+    
+                if(orderDocs){
+                    let filteredDate = orderDocs.filter((doc)=>{
+                        let dt = new Date(doc.tanggal);
+                        let dtyear = dt.getFullYear();
+                        let dtmonth = dt.getMonth() + 1;
+                        if(dtyear == year && dtmonth == validMonth){
+                            return doc;
+                        }
+                    }).map(item => new Date(item.tanggal).getDate())
+                    let dates = new Date(year,validMonth,0).getDate();
+                    
+                    if(filteredDate.length > 0){
+                        return res.json({
+                            ok : true,
+                            details : {
+                                month : validMonth,
+                                year : Number(year),
+                                data : Array(dates).fill().map((_,idx) => idx +1 ).filter(item => filteredDate.indexOf(item) === -1)
+                            }
+                        });
+                    }
+                    return res.json({
+                        ok : true,
+                        details : {
+                            month : validMonth,
+                            year : Number(year),
+                            data : Array(dates).fill().map((_,idx) => idx +1 )
+                        }
+                    });
+                }
+                return res.json({
+                    ok : false,
+                    message : "tidak ada orderan ataupun paket"
+                })
+            }
+            return res.json({
+                ok : false,
+                message: "pastikan masukkan tahun ini atau lebih"
+            })
+        }
+        return res.json({
+            ok : false,
+            message : "pastikan dengan format ?month=<month>&year=<year>"
+        })
+    } catch (e) {
+        console.log(e,"baru");
+        return res.send("!ok");
+    }
+})
+
 router.get("/getalldata", async (req,res) => {
     const urlParam = url.parse(req.url,true);
     const query = urlParam.query;
