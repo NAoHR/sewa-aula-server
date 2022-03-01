@@ -13,7 +13,7 @@ router.post("/order/:paketId", async (req,res) => {
 
         if(paketDoc){
             const detail = req.body;
-            const newDate = new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).setHours(0,0,0,0)
+            const newDate = new Date(new Date(isNaN(Number(detail.tanggal)) ? detail.tanggal : Number(detail.tanggal)).toLocaleDateString({timeZone : "Asia/Jakarta"})).setHours(0,0,0,0)
 
             const orderan = new Order({
                 paketId : paketId,
