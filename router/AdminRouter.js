@@ -324,8 +324,9 @@ router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
                 })
             }else{
                 if(relatedOrderDoc.length > 0){
-                    return res.status(400).json({
+                    return res.json({
                         ok : false,
+                        errorcode : "TASI",
                         message : `terdapat ${relatedOrderDoc.length} item yang akan bergantung pada id ini`
                     })
                 }else{
