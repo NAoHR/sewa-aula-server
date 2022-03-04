@@ -297,7 +297,6 @@ router.delete("/delete/order/:orderId", authorizeUser,async (req,res) => {
 router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
     const {paketId} = req.params;
     try{
-
         const toBeDeletedPacket = await Paket.find({_id : paketId});
 
         if(toBeDeletedPacket){
@@ -326,7 +325,7 @@ router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
             }else{
                 if(relatedOrderDoc.length > 0){
                     return res.json({
-                        ok : true,
+                        ok : false,
                         message : `terdapat ${relatedOrderDoc.length} item yang akan bergantung pada id ini`
                     })
                 }else{
