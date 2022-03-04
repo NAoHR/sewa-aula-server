@@ -324,7 +324,7 @@ router.delete("/delete/paket/:paketId", authorizeUser ,async (req,res) => {
                 })
             }else{
                 if(relatedOrderDoc.length > 0){
-                    return res.json({
+                    return res.status(400).json({
                         ok : false,
                         message : `terdapat ${relatedOrderDoc.length} item yang akan bergantung pada id ini`
                     })
